@@ -17,23 +17,7 @@ class Graphenliste
   
   def initialize(*graphen)
     @graphs = graphen
-    #Ab hier werden zwei Schleifen implementiert, um zu verhindern, dass es 2 Graphen mit gleichen Knoten gibt.
-    #Da die Kanten hier gerichtet sind, muss nicht "ueberkreuz" ueberprueft werden.
-    i = 0
-    while i < @graphs.size
-      j = 0
-      while j < @graphs.size
-        if @graphs[i].knotena == @graphs[j].knotena
-          if @graphs[i].knotenb == @graphs[j].knotenb
-            if i != j
-              @graphs.delete_at(j)
-            end
-          end
-        end
-        j += 1
-      end
-      i += 1
-    end 
+    self.testlist
   end
   
   def to_s #Da @graphs ein Array ist und wir die to_s Methode von den Graphen auch schon definiert haben, ist hier nichts mehr zu tun:
@@ -69,6 +53,39 @@ class Graphenliste
   
   def add(graph) #hier ist eine Methode, um zu @graphs einen Graphen hinzuzufügen
     @graphs[@graphs.size] = graph
+    self.testlist
+  end
+  
+  def del(i)
+    if i < @graphs.size
+      @graphs.delete_at(i)
+    else
+      puts "Graph nicht vorhanden!"
+    end
+  end
+  
+  def testlist
+    #Ab hier werden zwei Schleifen implementiert, um zu verhindern, dass es 2 Graphen mit gleichen Knoten gibt.
+    #Da die Kanten hier gerichtet sind, muss nicht "ueberkreuz" ueberprueft werden.
+    i = 0
+    while i < @graphs.size
+      j = 0
+      while j < @graphs.size
+        if @graphs[i].knotena == @graphs[j].knotena
+          if @graphs[i].knotenb == @graphs[j].knotenb
+            if i != j
+              @graphs.delete_at(i)
+              found = true
+            end
+          end
+        end
+        j += 1
+      end
+      i += 1
+    end
+    if found
+      puts "Graph wurde geloescht, da nicht 2 Kanten zwischen zwei Knoten existieren koennen.\nEs wird immer der erste Graph geloescht und durch den neueren ersetzt!"
+    end
   end
   
   
@@ -85,7 +102,7 @@ class Graphenliste
   g = Graphenliste.new()
   running = true
   while running
-    puts "Neuer Graph(n), Laenge einer Strecke berechnen(l), Graphen anzeigen (d) oder beenden(q)"
+    puts "Neuer Graph(n), Laenge einer Strecke berechnen(b), Graphen anzeigen (d), loeschen(l) oder beenden(q)"
     eingabe = gets.chomp
     
     if eingabe == "n"#
@@ -97,7 +114,7 @@ class Graphenliste
       running = false
       break
     
-    elsif eingabe == "l"
+    elsif eingabe == "b"
       s = Array.new
       puts "Knotenpunkte eingeben und je mit Enter bestaetigen, mit \"-q\" beenden:"
       i = 0
@@ -115,6 +132,10 @@ class Graphenliste
       puts g.getlength(*s)
     elsif eingabe == "d"
       puts g.to_s
+    elsif eingabe == "l"
+      puts "Welcher Graph soll geloescht werden? (Index angeben)"
+      i = gets.chomp.to_i
+      g.del(i)
     else
       puts "Ungueltige Eingabe! (n, q, l oder d)"
     end
